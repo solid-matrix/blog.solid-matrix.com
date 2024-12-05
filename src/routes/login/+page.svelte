@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { userManager } from "$lib/user-manager";
 
-    onMount(() => {
-        userManager.signinRedirect();
+    onMount(async () => {
+        await userManager.signinRedirect();
     });
 </script>

@@ -1,7 +1,7 @@
 import { UserManager } from 'oidc-client-ts';
 
 export const userManager = new UserManager({
-    authority: "https://login.solid-matrix.com",
+    authority: "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_wJTrQu8bL",
     client_id: "3v87ekte9llecjli3b5l207u16",
     redirect_uri: "https://blog.solid-matrix.com",
     response_type: "code",
