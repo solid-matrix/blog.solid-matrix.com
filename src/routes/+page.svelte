@@ -8,6 +8,7 @@
 
     onMount(() => {
         userManager.signinCallback().then((user) => {
+            console.log(user);
             email = user?.profile?.email as string;
             accessToken = user?.access_token as string;
             idToken = user?.id_token as string;
@@ -19,11 +20,8 @@
 <h1>Home Page</h1>
 
 <div>
-    Hello: <pre id="email"></pre>
-    Access token:
-    <pre id="access-token"></pre>
-    ID token:
-    <pre id="id-token"></pre>
-    Refresh token:
-    <pre id="refresh-token"></pre>
+    <p>Hello: {email}</p>
+    <p>Access token: {accessToken}</p>
+    <p>ID token: {idToken}</p>
+    <p>Refresh token: {refreshToen}</p>
 </div>
