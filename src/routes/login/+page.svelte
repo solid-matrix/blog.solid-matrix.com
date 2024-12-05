@@ -1,7 +1,8 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { userManager } from "$lib/user-manager";
 
-    $effect(() => {
+    onMount(() => {
         userManager.signinRedirect();
     });
 </script>

@@ -1,11 +1,12 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { userManager } from "$lib/user-manager";
     let email = $state("");
     let accessToken = $state("");
     let idToken = $state("");
     let refreshToen = $state("");
 
-    $effect(() => {
+    onMount(() => {
         userManager.signinCallback().then((user) => {
             email = user?.profile?.email as string;
             accessToken = user?.access_token as string;
