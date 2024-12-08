@@ -6,7 +6,7 @@ export const userManager = new UserManager({
     client_id: Consts.OidcClientId,
     redirect_uri: Consts.OidcSignInRedirectUrl,
     response_type: Consts.OidcResoponseType,
-    scope: Consts.OidcScope
+    scope: Consts.OidcScope,
 });
 
 export async function SignOut(redirectUrl: string | undefined = undefined) {

@@ -1,1 +1,1 @@
-<h1>Project Page</h1>
+<h1>Projects List Page</h1>

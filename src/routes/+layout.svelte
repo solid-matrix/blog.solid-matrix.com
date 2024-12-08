@@ -3,78 +3,165 @@
 	import { page } from "$app/stores";
 	import Icon from "@iconify/svelte";
 
+	import { SignIn, SignOut, GetUser } from "$lib/auth";
+	import { onMount } from "svelte";
+
 	let { children } = $props();
-	let navs = [
-		{ name: "home", icon: "fluent:home-24-filled", path: "/" },
-		{ name: "article", icon: "fluent:pen-24-filled", path: "/article" },
-		{ name: "project", icon: "fluent:projection-screen-text-24-filled", path: "/project" },
-		{ name: "about", icon: "fluent:book-information-24-filled", path: "/about" },
-	];
-	let menuOpen = $state(false);
+	let navOpen = $state(false);
+	let profileOpen = $state(false);
+	let user: any = $state(null);
+	let navs = $derived([
+		{ name: "home", icon: "fluent:home-24-filled", path: "/", active: $page.url.pathname == "/" },
+		{ name: "posts", icon: "fluent:pen-24-filled", path: "/post", active: $page.url.pathname.startsWith("/post") },
+		{ name: "projects", icon: "fluent:projection-screen-text-24-filled", path: "/project", active: $page.url.pathname.startsWith("/project") },
+		{ name: "about", icon: "fluent:book-information-24-filled", path: "/about", active: $page.url.pathname.startsWith("/about") },
+	]);
+
+	onMount(async () => {
+		user = await GetUser();
+		console.log(user);
+	});
 </script>
 
+<svelte:window
+	onclick={() => {
+		navOpen = false;
+		profileOpen = false;
+	}} />
+
 <div class="h-screen w-screen overflow-hidden flex flex-col">
-	<header class="flex-none bg-gray-800">
-		<nav>
-			<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div class="flex h-16 items-center justify-between">
-					<div class="flex items-center">
-						<div class="shrink-0 cursor-default select-none">
-							<span class="text-lg font-semibold text-white">Solid Matrix Blog</span>
-						</div>
-						<div class="hidden md:block">
-							<div class="ml-10 flex items-baseline space-x-4">
-								{#each navs as nav}
-									{#if $page.url.pathname == nav.path}
-										<a href={nav.path} class="group flex gap-x-1 rounded-md px-3 py-2 text-sm font-medium text-white bg-gray-900" aria-current="page">
-											<Icon icon={nav.icon} class="size-5 shrink-0" />
-											<span class="uppercase">{nav.name}</span>
-										</a>
-									{:else}
-										<a href={nav.path} class="group flex gap-x-1 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700">
-											<Icon icon={nav.icon} class="size-5 shrink-0" />
-											<span class="uppercase">{nav.name}</span>
-										</a>
-									{/if}
-								{/each}
-							</div>
-						</div>
-					</div>
-					<div class="-mr-2 flex md:hidden">
-						<!-- Mobile menu button -->
+	<header class="flex-none">
+		<nav class="bg-white shadow select-none">
+			<div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+				<div class="relative flex h-16 justify-between">
+					<div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
 						<button
-							onclick={() => (menuOpen = !menuOpen)}
+							onclick={(e) => {
+								e.stopPropagation();
+								navOpen = !navOpen;
+							}}
 							type="button"
-							class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+							class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
 							aria-controls="mobile-menu"
 							aria-expanded="false">
 							<span class="absolute -inset-0.5"></span>
 							<span class="sr-only">Open main menu</span>
-							<!-- Menu open: "hidden", Menu closed: "block" -->
-							<Icon class="{menuOpen ? 'hidden' : 'block'} size-6" icon="fluent:navigation-24-filled" />
-							<!-- Menu open: "block", Menu closed: "hidden" -->
-							<Icon class="{menuOpen ? 'block' : 'hidden'} size-6" icon="fluent:dismiss-24-filled" />
+							<Icon class="{navOpen ? 'hidden' : 'block'} size-6" icon="fluent:navigation-24-filled" />
+							<Icon class="{navOpen ? 'block' : 'hidden'} size-6" icon="fluent:dismiss-24-filled" />
 						</button>
+					</div>
+					<div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+						<div class="flex shrink-0 items-center cursor-default select-none">
+							<span class="text-md font-semibold text-indigo-500">Solid Matrix Blog</span>
+						</div>
+						<div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+							{#each navs as nav}
+								<a
+									href={nav.path}
+									class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium {nav.active
+										? 'border-indigo-500 text-gray-900'
+										: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}"
+									aria-current="page">
+									<span class="uppercase">{nav.name}</span>
+								</a>
+							{/each}
+						</div>
+					</div>
+					<div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+						<!-- <button
+							type="button"
+							class="relative rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+							<span class="absolute -inset-1.5"></span>
+							<span class="sr-only">View notifications</span>
+							<svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+							</svg>
+						</button> -->
+
+						<!-- Profile dropdown -->
+
+						<div class="relative ml-3">
+							<div class="flex items-center gap-2">
+								<button
+									onclick={(e) => {
+										e.stopPropagation();
+										profileOpen = !profileOpen;
+									}}
+									type="button"
+									class="relative flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+									id="user-menu-button"
+									aria-expanded="false"
+									aria-haspopup="true">
+									<span class="absolute -inset-1.5"></span>
+									<span class="sr-only">Open user menu</span>
+									<Icon class="size-8 {user ? 'text-indigo-500' : ''}" icon="fluent:person-circle-24-filled" />
+								</button>
+							</div>
+
+							<!--
+					  Dropdown menu, show/hide based on menu state.
+		  
+					  Entering: "transition ease-out duration-200"
+						From: "transform opacity-0 scale-95"
+						To: "transform opacity-100 scale-100"
+					  Leaving: "transition ease-in duration-75"
+						From: "transform opacity-100 scale-100"
+						To: "transform opacity-0 scale-95"
+					-->
+							{#if profileOpen}
+								<div
+									class="absolute right-0 z-10 mt-2 min-w-48 w-fit origin-top-right rounded-md bg-white py-0 shadow-lg ring-1 ring-black/5 focus:outline-none"
+									role="menu"
+									aria-orientation="vertical"
+									aria-labelledby="user-menu-button"
+									tabindex="-1">
+									{#if user}
+										<span class="block px-4 py-2 text-sm text-indigo-500 font-semibold whitespace-nowrap w-full text-left border-b border-black/5"
+											>{user?.profile?.email}</span>
+										<a
+											href="/user"
+											class="block px-4 py-2 text-sm text-gray-700 whitespace-nowrap w-full text-left"
+											role="menuitem"
+											tabindex="-1"
+											id="user-menu-item-0">Your Profile</a>
+										<button
+											onclick={() => SignOut()}
+											class="block px-4 py-2 text-sm text-gray-700 whitespace-nowrap w-full text-left"
+											role="menuitem"
+											tabindex="-1"
+											id="user-menu-item-2">Sign out</button>
+									{:else}
+										<button
+											onclick={() => SignIn()}
+											class="block px-4 py-2 text-sm text-gray-700 whitespace-nowrap w-full text-left"
+											role="menuitem"
+											tabindex="-1"
+											id="user-menu-item-2">Sign In</button>
+									{/if}
+									<!-- Active: "bg-gray-100 outline-none", Not Active: "" -->
+								</div>
+							{/if}
+						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- Mobile menu, show/hide based on menu state. -->
-			{#if menuOpen}
-				<div class="md:hidden" id="mobile-menu">
-					<div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+			{#if navOpen}
+				<div class="sm:hidden" id="mobile-menu">
+					<div class="space-y-1 pb-4 pt-2">
 						{#each navs as nav}
-							{#if $page.url.pathname == nav.path}
-								<a href={nav.path} class="group flex gap-x-1 rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">
-									<Icon icon={nav.icon} class="size-5 shrink-0" />
-									<span class="uppercase">{nav.name}</span>
-								</a>
-							{:else}
-								<a href={nav.path} class="group flex gap-x-1 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700">
-									<Icon icon={nav.icon} class="size-5 shrink-0" />
-									<span class="uppercase">{nav.name}</span>
-								</a>
-							{/if}
+							<a
+								href={nav.path}
+								class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium {nav.active
+									? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+									: 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}"
+								aria-current="page">
+								<span class="uppercase">{nav.name}</span>
+							</a>
 						{/each}
 					</div>
 				</div>
@@ -92,7 +179,7 @@
 
 	<footer class="flex-none bg-gray-900">
 		<div class="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
-			<div class="flex justify-center gap-x-6 md:order-2">
+			<!-- <div class="flex justify-center gap-x-6 md:order-2">
 				<a href="/" class="text-gray-400 hover:text-gray-300">
 					<span class="sr-only">Facebook</span>
 					<svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -136,7 +223,7 @@
 							clip-rule="evenodd" />
 					</svg>
 				</a>
-			</div>
+			</div> -->
 			<p class="mt-8 text-center text-sm/6 text-gray-400 md:order-1 md:mt-0">&copy; 2024 solid-matrix.com All rights reserved.</p>
 		</div>
 	</footer>

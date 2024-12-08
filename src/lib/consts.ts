@@ -12,4 +12,4 @@ export const OidcAuthority = "https://cognito-idp.ap-east-1.amazonaws.com/ap-eas
 export const OidcClientId = "27l2ag3skmhoqp746lemceb25e";
 export const OidcResoponseType = "code";
 export const OidcScope = "email openid phone profile";
-export const OidcDomain = "https://ap-east-1ek7rctevm.auth.ap-east-1.amazoncognito.com";
+export const OidcDomain = "https://login.solid-matrix.com";
